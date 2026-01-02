@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>NovaSeek</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+--bg:#ffffff;--surface:#ffffff;--muted:#6b7278;--text:#0b0d10;--brand:#4285f4;--accent:#5985E1;--shadow:rgba(0,0,0,0.08);--card-border:#e6e7e8;--chip-bg:#fff;--chip-border:#e6e7e8;--radius-lg:14px;--radius-pill:999px;--glass:rgba(255,255,255,0.85);--glass-dark:rgba(0,0,0,0.5);--success:#34a853;--danger:#ea4335;--transition:200ms ease;--max-width:980px;--search-height:56px;--card-padding:16px;
+}
+body.dark{--bg:#0b0c10;--surface:#111215;--muted:#b0b3b6;--text:#eef0f2;--chip-bg:#111215;--chip-border:#26282b;--card-border:#222428;--glass:rgba(10,10,12,0.7);}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{margin:0;padding:0;font-family:"Roboto",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;background:var(--bg);color:var(--text);display:flex;flex-direction:column;align-items:center;transition:background var(--transition),color var(--transition);}
+.header{position:relative;width:100%;max-width:var(--max-width);padding:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.brand{display:flex;gap:12px;align-items:center;}
+.brand .dot{width:14px;height:14px;border-radius:50%;background:linear-gradient(135deg,var(--brand),#8ab4f8);box-shadow:0 0 12px rgba(66,133,244,0.18);}
+.brand .logo{font-family:'Orbitron',sans-serif;font-weight:700;font-size:22px;letter-spacing:.06em;background:linear-gradient(90deg,#8ab4f8,#a0c3ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.user-badge{min-width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:var(--chip-bg);background:linear-gradient(135deg,var(--brand),#5a8ef6);box-shadow:0 6px 18px rgba(90,142,246,0.12);cursor:pointer;}
+.icon-btn{width:44px;height:44px;border-radius:50%;border:1px solid var(--card-border);background:var(--chip-bg);display:grid;place-items:center;cursor:pointer;transition:transform .06s,background var(--transition),border-color var(--transition);}
+.icon-btn:hover{transform:scale(.98);}
+.container{width:100%;max-width:var(--max-width);padding:0 16px 80px 16px;display:flex;flex-direction:column;align-items:center;gap:18px;}
+.hero{margin-top:6vh;text-align:center;}
+.wordmark{font-family:'Orbitron',sans-serif;font-weight:700;font-size:48px;background:linear-gradient(90deg,#8ab4f8,#a0c3ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:.06em;margin-bottom:6px;}
+.subtitle{color:var(--muted);font-size:14px;margin-top:4px;}
+.search-wrap{width:100%;max-width:720px;display:flex;flex-direction:column;gap:8px;align-items:center;}
+.search{width:100%;display:flex;gap:10px;align-items:center;padding:10px;border-radius:999px;background:var(--surface);border:1px solid var(--card-border);box-shadow:0 6px 18px var(--shadow);transition:box-shadow .18s,border-color .18s,background .2s;height:var(--search-height);position:relative;}
+.ai-suggest{position:absolute;top:calc(var(--search-height)+8px);left:0;width:100%;max-height:280px;overflow-y:auto;border-radius:var(--radius-lg);background:var(--surface);border:1px solid var(--card-border);box-shadow:0 16px 48px rgba(0,0,0,0.18),0 0 0 1px rgba(0,0,0,0.02);z-index:1200;padding:8px 0;display:none;}
+.ai-suggest.visible{display:block;}
+.ai-suggest ul{list-style:none;margin:0;padding:0;}
+.ai-suggest li{padding:10px 16px;font-size:15px;color:var(--text);cursor:pointer;display:flex;align-items:center;gap:12px;transition:background 120ms ease;outline:none;}
+.ai-suggest li:hover, .ai-suggest li[aria-selected="true"]{background:rgba(66,133,244,0.06);}
+body.dark .ai-suggest li:hover, body.dark .ai-suggest li[aria-selected="true"]{background:rgba(255,255,255,0.08);}
+#userDropdown{position:absolute;top:60px;right:16px;width:240px;background:var(--surface);border:1px solid var(--card-border);border-radius:12px;box-shadow:0 16px 48px rgba(0,0,0,0.18),0 0 0 1px rgba(0,0,0,0.02);z-index:1500;padding:8px 0;display:none;opacity:0;transform:translateY(-8px);transition:opacity 200ms ease-out,transform 200ms ease-out;}
+#userDropdown.visible{display:block;opacity:1;transform:translateY(0);}
+#accountModal,#backdrop{position:fixed;top:0;left:0;width:100%;height:100%;z-index:2000;display:none;place-items:center;}
+#backdrop{background:rgba(0,0,0,0.5);z-index:1999;}
+#accountModal.visible,#backdrop.visible{display:grid;}
+.modal-content{background:var(--surface);padding:24px;border-radius:16px;width:90%;max-width:480px;box-shadow:0 16px 48px rgba(0,0,0,0.3);transition:background var(--transition);}
+.modal-content h3{margin-top:0;}
+.modal-content label{display:block;margin-top:12px;font-size:14px;color:var(--muted);}
+.modal-content input{width:100%;padding:10px;border:1px solid var(--card-border);border-radius:8px;margin-top:4px;background:var(--chip-bg);color:var(--text);}
+.modal-actions{margin-top:24px;text-align:right;}
+.modal-actions button{margin-left:8px;padding:10px 18px;border-radius:8px;cursor:pointer;font-weight:500;}
+.modal-actions .btn-save{background:var(--brand);color:white;border:none;}
+.modal-actions .btn-cancel{background:var(--chip-bg);border:1px solid var(--card-border);color:var(--text);}
+.search:focus-within{box-shadow:0 12px 36px rgba(0,0,0,0.08);border-color:rgba(0,0,0,0.06);}
+.search input[type="text"]{flex:1;border:0;outline:0;background:transparent;color:var(--text);font-size:16px;padding:8px 6px;}
+.chips{width:100%;max-width:720px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:6px 6px;}
+.chips .chip{padding:8px 12px;border-radius:999px;background:var(--chip-bg);border:1px solid var(--chip-border);cursor:pointer;transition:background .15s, transform .08s;color:var(--text);font-size:14px;}
+.chips .chip:hover{background:rgba(66,133,244,0.06);transform:translateY(-1px);}
+.results{width:100%;max-width:720px;display:flex;flex-direction:column;gap:16px;margin-top:6px;align-items:stretch;}
+.side-panel{width:320px;display:flex;flex-direction:column;gap:12px;}
+.panel{padding:12px;border-radius:12px;background:var(--surface);border:1px solid var(--card-border);box-shadow:0 8px 28px rgba(0,0,0,0.06);}
+.panel h4{margin:0 0 8px 0;font-size:16px;color:var(--text);}
+.list .row{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:10px;border-radius:10px;cursor:pointer;transition:background .12s;background:transparent;}
+.list .row:hover{background:rgba(66,133,244,0.06);}
+.list .rank{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--chip-bg);border:1px solid var(--card-border);}
+.footer{position:fixed;left:12px;bottom:10px;z-index:20;font-size:13px;color:var(--muted);background:var(--glass);padding:6px 10px;border-radius:10px;border:1px solid var(--card-border);}
+@media(max-width:860px){.cols{grid-template-columns:1fr;gap:12px;}.side-panel{width:100%;}}
+@media(max-width:520px){.wordmark{font-size:36px;}}
+</style>
+</head>
+<body>
+<header class="header" role="banner">
+<div class="brand" aria-hidden="false"><div class="dot"></div><div class="logo">NovaSeek</div></div>
+<div id="authArea" aria-live="polite"></div>
+<div id="userDropdown" role="menu" aria-hidden="true"></div>
+</header>
+<div id="backdrop" aria-hidden="true"></div>
+<div id="accountModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true"></div>
+
+<main class="container" role="main">
+<section class="hero" aria-labelledby="hero-title">
+<h1 id="hero-title" class="wordmark">NovaSeek</h1>
+<div class="subtitle">智能搜尋‑AI 建議、你的收藏與統計</div>
+</section>
+<section class="search-wrap" aria-label="搜尋區">
+<div class="search" id="searchBox">
+<input id="searchInput" type="text" placeholder="在 NovaSeek 上搜尋（按 Enter 或點按放大鏡）" autocomplete="off" aria-label="搜尋輸入" />
+<button class="icon-btn" id="btnSearch" title="搜尋" aria-label="搜尋按鈕">🔍</button>
+<button class="icon-btn" id="btnMic" title="語音搜尋" aria-label="語音搜尋">🎤</button>
+<div class="ai-suggest" id="aiSuggest" role="listbox" aria-label="建議清單"></div>
+</div>
+<div class="chips" id="chips" role="list" aria-label="熱門或建議關鍵字"></div>
+</section>
+<div class="cols" style="width:100%;max-width:var(--max-width);display:grid;grid-template-columns:1fr 320px;gap:18px;margin-top:6px;">
+<div><div class="results" id="results" role="region" aria-live="polite" aria-label="搜尋結果"></div></div>
+<aside class="side-panel" aria-label="側邊功能">
+<div class="panel" id="panelTrending" aria-live="polite">
+<h4>熱門搜尋</h4>
+<div class="list" id="trendingList" role="list"></div>
+</div>
+<div class="panel" id="panelRecent" aria-live="polite">
+<h4>你的最近搜尋</h4>
+<div class="list" id="recentList" role="list"></div>
+</div>
+</aside>
+</div>
+</main>
+<div class="footer" aria-hidden="false">Copyright © 2025 NovaSeek 保留一切權利。</div>
+<button id="modeBtn" title="切換深淺模式" aria-pressed="false" style="position:fixed;right:20px;bottom:20px;z-index:1200;padding:10px 15px;border-radius:12px;border:1px solid var(--card-border);background:var(--surface);color:var(--text);cursor:pointer;font-weight:500;">自訂 NovaSeek</button>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+const FIREBASE_CONFIG={apiKey:"AIzaSyA7K4x1Di_xUaVt7MF08LfumJxc10dqa3c",authDomain:"sample-firebase-ai-app-df21b.firebaseapp.com",projectId:"sample-firebase-ai-app-df21b",storageBucket:"sample-firebase-ai-app-df21b",messagingSenderId:"762970139210",appId:"1:762970139210:web:149e9ab5e9593a484cd4b3"};
+firebase.initializeApp(FIREBASE_CONFIG);
+const auth=firebase.auth();
+const db=firebase.firestore();
+const provider=new firebase.auth.GoogleAuthProvider();
+const authArea=document.getElementById('authArea');
+const userDropdown=document.getElementById('userDropdown');
+const accountModal=document.getElementById('accountModal');
+const backdrop=document.getElementById('backdrop');
+const searchInput=document.getElementById('searchInput');
+const btnSearch=document.getElementById('btnSearch');
+const btnMic=document.getElementById('btnMic');
+const aiSuggest=document.getElementById('aiSuggest');
+const chipsDiv=document.getElementById('chips');
+const resultsDiv=document.getElementById('results');
+const trendingList=document.getElementById('trendingList');
+const recentList=document.getElementById('recentList');
+const modeBtn=document.getElementById('modeBtn');
+let currentUser=null;
+
+function escapeHtml(str){if(!str)return'';return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function toggleDropdown(show){userDropdown.classList.toggle('visible',show);userDropdown.setAttribute('aria-hidden',!show);}
+async function handleLogin(){backdrop.classList.add('visible');accountModal.classList.add('visible');accountModal.setAttribute('aria-hidden','false');const modalContent=document.createElement('div');modalContent.className='modal-content';modalContent.innerHTML=`<h3 id="modalTitle" style="text-align:center;">登入 NovaSeek</h3><button onclick="loginWithGoogle()" style="width:100%; padding:10px; margin-bottom:20px; border:1px solid var(--card-border); border-radius:8px; background:var(--surface); cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px;"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18">使用 Google 帳號登入</button>`;accountModal.innerHTML='';accountModal.appendChild(modalContent);}
+function loginWithGoogle(){auth.signInWithRedirect(provider);}
+async function handleLogout(){try{await auth.signOut();toggleDropdown(false);}catch(e){alert("登出失敗："+e.message);}}
+function renderAuthUI(){authArea.innerHTML='';userDropdown.innerHTML='';if(currentUser){const badge=document.createElement('div');badge.className='user-badge';badge.id='userBadge';badge.textContent=(currentUser.displayName?currentUser.displayName[0].toUpperCase():(currentUser.email?currentUser.email[0].toUpperCase():'U'));badge.addEventListener('click',(e)=>{e.stopPropagation();toggleDropdown(!userDropdown.classList.contains('visible'));});authArea.appendChild(badge);userDropdown.innerHTML=`<div class="info"><strong>${escapeHtml(currentUser.displayName||'未設定名稱')}</strong><span>${escapeHtml(currentUser.email)}</span></div><button onclick="handleLogout()" role="menuitem">登出</button>`;}else{const btn=document.createElement('button');btn.id='authBtn2';btn.textContent='登入';btn.className='icon-btn';btn.style.width='auto';btn.style.borderRadius='12px';btn.style.padding='8px 12px';btn.addEventListener('click',handleLogin);authArea.appendChild(btn);}updateTrendingUI();updateRecentUI();updateInitialChips();}
+auth.onAuthStateChanged(user=>{if(user){currentUser={email:user.email,displayName:user.displayName||user.email.split('@')[0],uid:user.uid};renderAuthUI();}else{currentUser=null;renderAuthUI();}});
+
+async function fetchAISuggestions(query){if(!query)return[];const q=query.trim().toLowerCase();if(!q)return[];const snap=await db.collection('knowledgeBase').where('termLower','>=',q).where('termLower','<=',q+'\uf8ff').limit(10).get();return snap.docs.map(d=>d.data().term);}
+async function updateTrendingUI(){const snap=await db.collection('searchRecords').orderBy('count','desc').limit(5).get();trendingList.innerHTML='';snap.docs.forEach((doc,i)=>{const row=document.createElement('div');row.className='row';row.innerHTML=`<div class="rank">${i+1}</div><div>${escapeHtml(doc.id)}</div>`;row.addEventListener('click',()=>performSearch(doc.id));trendingList.appendChild(row);});}
+async function updateRecentUI(){if(!currentUser)return;const snap=await db.collection('searchRecords').doc(currentUser.uid).collection('recent').orderBy('ts','desc').limit(5).get();recentList.innerHTML='';snap.docs.forEach((doc)=>{const row=document.createElement('div');row.className='row';row.textContent=doc.id;row.addEventListener('click',()=>performSearch(doc.id));recentList.appendChild(row);});}
+async function updateInitialChips(){const snap=await db.collection('initialKeywords').orderBy('rank','asc').get();chipsDiv.innerHTML='';snap.docs.forEach(doc=>{const chip=document.createElement('div');chip.className='chip';chip.textContent=doc.data().term;chip.addEventListener('click',()=>performSearch(doc.data().term));chipsDiv.appendChild(chip);});}
+async function performSearch(term){term=term.trim();if(!term)return;window.open(`https://search.novaseek.org/?q=${encodeURIComponent(term)}`,'_blank');if(currentUser){const userRef=db.collection('searchRecords').doc(currentUser.uid).collection('recent').doc(term);await userRef.set({ts:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});}const globalRef=db.collection('searchRecords').doc(term);await globalRef.set({count:firebase.firestore.FieldValue.increment(1)},{merge:true});updateTrendingUI();updateRecentUI();}
+searchInput.addEventListener('input',async e=>{const query=e.target.value;if(!query){aiSuggest.classList.remove('visible');return;}const suggestions=await fetchAISuggestions(query);aiSuggest.innerHTML='';if(suggestions.length){const ul=document.createElement('ul');suggestions.forEach(s=>{const li=document.createElement('li');li.textContent=s;li.addEventListener('click',()=>performSearch(s));ul.appendChild(li);});aiSuggest.appendChild(ul);aiSuggest.classList.add('visible');}else{aiSuggest.classList.remove('visible');}});
+searchInput.addEventListener('keydown',e=>{if(e.key==='Enter'){performSearch(searchInput.value);aiSuggest.classList.remove('visible');}});
+btnSearch.addEventListener('click',()=>performSearch(searchInput.value));
+document.addEventListener('click',()=>{aiSuggest.classList.remove('visible');toggleDropdown(false);backdrop.classList.remove('visible');accountModal.classList.remove('visible');accountModal.setAttribute('aria-hidden','true');});
+modeBtn.addEventListener('click',()=>{document.body.classList.toggle('dark');modeBtn.setAttribute('aria-pressed',document.body.classList.contains('dark'));});
+</script>
+</body>
+</html>
